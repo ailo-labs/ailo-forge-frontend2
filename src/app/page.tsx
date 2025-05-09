@@ -18,7 +18,7 @@ export default function HomePage() {
   return (
     <div className="home-page container">
       <section className="hero-section">
-        <motion.h1
+        <motion.h1<HTMLHeadingElement>
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -29,7 +29,7 @@ export default function HomePage() {
           Ailo Forge™
         </motion.h1>
 
-        <motion.h2
+        <motion.h2<HTMLHeadingElement>
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -40,7 +40,7 @@ export default function HomePage() {
           LLM Customization · AI Development · AI Deployment
         </motion.h2>
 
-        <motion.p
+        <motion.p<HTMLParagraphElement>
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -53,7 +53,7 @@ export default function HomePage() {
           for industries like finance, biotech, manufacturing, and more.
         </motion.p>
 
-        <motion.button
+        <motion.button<HTMLButtonElement>
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
