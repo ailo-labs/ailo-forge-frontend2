@@ -1,4 +1,3 @@
-// app/chat/page.tsx – Chat page for users to converse with their modified model
 "use client";
 import React, { useState } from "react";
 import axios from "axios";
@@ -14,8 +13,8 @@ export default function ChatPage() {
   const handleSend = async () => {
     if (!prompt.trim() || !selectedModel) return;
 
-    // Add user's message to chat
-    setChatHistory(prev => [...prev, { role: "user", message: prompt }]);
+    // append user to history
+    setChatHistory(h => [...h, { role: "user", message: prompt }]);
 
     const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080").replace(/\/+$/, "");
     try {
@@ -25,12 +24,11 @@ export default function ChatPage() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      // The backend returns { success: true, response: "..." }
-      const botMessage = data.response;
-      setChatHistory(prev => [...prev, { role: "bot", message: botMessage }]);
+      // backend returns { success, response }
+      setChatHistory(h => [...h, { role: "bot", message: data.response }]);
     } catch (err: any) {
-      console.error("Error in chat:", err.response || err.message);
-      alert("Error communicating with the model: " + (err.response?.data?.detail || err.message));
+      console.error("Chat error:", err.response || err.message);
+      alert("Error communicating with model: " + (err.response?.data?.detail || err.message));
     }
 
     setPrompt("");
@@ -40,8 +38,10 @@ export default function ChatPage() {
     <div className="chat-page container">
       <h2>Chat with {selectedModel || "your model"}</h2>
       <div className="chat-history">
-        {chatHistory.map((msg, idx) => (
-          <div key={idx} className={`chat-bubble ${msg.role}`}>{msg.message}</div>
+        {chatHistory.map((m,i) => (
+          <div key={i} className={`chat-bubble ${m.role}`}>
+            {m.message}
+          </div>
         ))}
       </div>
       <div className="chat-input">
@@ -49,8 +49,8 @@ export default function ChatPage() {
           type="text"
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder="Type your message..."
+          onKeyDown={e => e.key === "Enter" && handleSend()}
+          placeholder="Type your message…"
         />
         <button onClick={handleSend} className="btn chat-send-btn">Send</button>
       </div>
