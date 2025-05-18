@@ -4,6 +4,32 @@
    progress bars, and pause/resume controls. It features a modern,
    clean black and white design with clear visual feedback.
 ------------------------------------------------------ */
+/* Indeterminate top loading bar */
+.loading-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(to right, #eee 0%, #000 50%, #eee 100%);
+  background-size: 200% 100%;
+  animation: loading 1.2s linear infinite;
+  z-index: 100;
+}
+@keyframes loading {
+  0%   { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* Success banner */
+.success-banner {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #d4edda;
+  color: #155724;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}
 
 .modify-model-page {
   padding: 60px 20px;
