@@ -1,4 +1,3 @@
-// app/modify/page.tsx
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,17 +10,17 @@ import Footer from "@/components/Footer";
 export default function ModifyModelPage() {
   const { selectedModel, setIsModified } = useModel();
   const router = useRouter();
-  const [mode, setMode] = useState<"standard" | "advanced">("standard");
 
-  // Standard mode state
+  const [mode, setMode] = useState<"standard" | "advanced">("standard");
   const [temperature, setTemperature] = useState(0.5);
   const [tokenLimit, setTokenLimit] = useState(512);
   const [instructions, setInstructions] = useState("");
-
-  // Advanced mode JSON state
   const [advancedJSON, setAdvancedJSON] = useState(
     `{"temperature":0.5,"tokenLimit":512,"instructions":""}`
   );
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleModify = async () => {
     if (!selectedModel) {
@@ -33,7 +32,7 @@ export default function ModifyModelPage() {
     if (mode === "advanced") {
       try {
         payload = JSON.parse(advancedJSON);
-      } catch (e) {
+      } catch {
         return alert("Invalid JSON in advanced mode!");
       }
       payload.modelId = selectedModel;
@@ -46,9 +45,10 @@ export default function ModifyModelPage() {
       };
     }
 
-    const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080")
-      .replace(/\/+$/, "");
+    const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080").replace(/\/+$/, "");
 
+    setIsLoading(true);
+    setSuccessMsg("");
     try {
       const { data } = await axios.post(
         `${backendUrl}/modify-file`,
@@ -56,15 +56,18 @@ export default function ModifyModelPage() {
         { headers: { "Content-Type": "application/json" } }
       );
       if (data.success) {
-        alert(data.message);
+        setSuccessMsg("✅ Model has been modified!");
         setIsModified(true);
-        router.push("/chat");
+        // auto‐navigate after a short delay:
+        setTimeout(() => router.push("/chat"), 1200);
       } else {
         alert("Modify failed: " + JSON.stringify(data));
       }
     } catch (err: any) {
       console.error("Modify error:", err.response?.data || err.message);
       alert("Error modifying model: " + (err.response?.data?.detail || err.message));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -79,19 +82,27 @@ export default function ModifyModelPage() {
 
   return (
     <div className="modify-model-page container">
+      {/* Loading bar */}
+      {isLoading && <div className="loading-bar" />}
+
+      {/* Success banner */}
+      {successMsg && <div className="success-banner">{successMsg}</div>}
+
       <h2>Modify {selectedModel}</h2>
       <div className="mode-toggle">
         <button
           className={`mode-btn ${mode === "standard" ? "active" : ""}`}
           onClick={() => setMode("standard")}
+          disabled={isLoading}
         >
-          Standard Mode
+          Standard
         </button>
         <button
           className={`mode-btn ${mode === "advanced" ? "active" : ""}`}
           onClick={() => setMode("advanced")}
+          disabled={isLoading}
         >
-          Advanced Mode
+          Advanced
         </button>
       </div>
 
@@ -99,21 +110,19 @@ export default function ModifyModelPage() {
         <div className="standard-interface">
           <SliderControl
             label="Creativity (Temperature)"
-            min={0}
-            max={1}
-            step={0.01}
+            min={0} max={1} step={0.01}
             value={temperature}
             onChange={e => setTemperature(parseFloat(e.target.value))}
             description="Adjust how creative responses are."
+            disabled={isLoading}
           />
           <SliderControl
             label="Token Limit"
-            min={128}
-            max={2048}
-            step={1}
+            min={128} max={2048} step={1}
             value={tokenLimit}
             onChange={e => setTokenLimit(parseInt(e.target.value))}
             description="Set maximum tokens per response."
+            disabled={isLoading}
           />
           <div className="instructions-control">
             <label>Additional Instructions:</label>
@@ -121,6 +130,7 @@ export default function ModifyModelPage() {
               placeholder="E.g. Focus on finance compliance..."
               value={instructions}
               onChange={e => setInstructions(e.target.value)}
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -131,6 +141,7 @@ export default function ModifyModelPage() {
             rows={8}
             value={advancedJSON}
             onChange={e => setAdvancedJSON(e.target.value)}
+            disabled={isLoading}
           />
           <small className="json-hint">
             Example: {"{\"temperature\":0.7,\"tokenLimit\":150,\"instructions\":\"You are a helpful assistant.\"}"}
@@ -139,7 +150,11 @@ export default function ModifyModelPage() {
       )}
 
       <div className="button-group">
-        <button onClick={handleModify} className="btn modify-btn">
+        <button
+          onClick={handleModify}
+          className="btn modify-btn"
+          disabled={isLoading}
+        >
           Modify Settings
         </button>
       </div>
