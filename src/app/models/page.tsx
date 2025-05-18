@@ -10,54 +10,59 @@ export default function ModelsPage() {
   const { setSelectedModel, setIsModified } = useModel();
   const router = useRouter();
 
-  // UI label, description, and actual HF repo ID
+  // List of publicly available Hugging Face models
   const models = [
     {
-      id: "7B-Base",
-      name: "7B-Base",
-      repo: "deepseek-ai/deepseek-llm-7b-base",
-      description: "Base conversational model with standard tuning.",
+      id: "Llama-2-7B",
+      name: "Llama 2 7B",
+      repo: "meta-llama/Llama-2-7b",
+      description: "Base Llama 2 7B from Meta.",
     },
     {
-      id: "67B-Chat",
-      name: "67B-Chat",
+      id: "Llama-2-7B-Chat",
+      name: "Llama 2 Chat 7B",
       repo: "meta-llama/Llama-2-7b-chat-hf",
-      description: "High capacity chat model with advanced dialogue capabilities.",
+      description: "Chat-tuned Llama 2 7B.",
     },
     {
-      id: "LLAMA-3-8B",
-      name: "LLAMA-3-8B",
+      id: "Llama-3-8B",
+      name: "Llama 3 8B",
       repo: "meta-llama/Llama-3-8b",
-      description: "Optimized for Llama-based tasks with industry-specific parameters.",
+      description: "Optimized for Llama-based tasks with industry-specific tuning.",
     },
     {
-      id: "MISTRAL-7B",
-      name: "MISTRAL-7B",
+      id: "Mistral-7B",
+      name: "Mistral 7B",
       repo: "mistralai/mistral-7b",
-      description: "Fast and efficient responses with low latency.",
+      description: "Open-source Mistral model for efficient inference.",
     },
     {
-      id: "FALCON-40B",
-      name: "FALCON-40B",
+      id: "Falcon-40B",
+      name: "Falcon 40B",
       repo: "tiiuae/falcon-40b",
-      description: "Large model with high versatility and custom tuning.",
+      description: "Large Falcon model with high versatility.",
     },
     {
       id: "GPT-J-6B",
-      name: "GPT-J-6B",
+      name: "GPT-J 6B",
       repo: "EleutherAI/gpt-j-6B",
-      description: "Open-source model for general tasks with customizable settings.",
+      description: "Classic GPT-J model for general tasks.",
     },
     {
-      id: "DeepSeek-Coder-33B",
-      name: "DeepSeek-Coder-33B",
-      repo: "deepseek-ai/deepseek-coder-33b",
-      description: "Code-specialized model with enhanced debugging features.",
+      id: "GPT-NeoX-20B",
+      name: "GPT-NeoX 20B",
+      repo: "EleutherAI/gpt-neox-20b",
+      description: "EleutherAI’s 20B parameter NeoX model.",
+    },
+    {
+      id: "Flan-T5-Large",
+      name: "FLAN-T5 Large",
+      repo: "google/flan-t5-large",
+      description: "Instruction-tuned T5 from Google (encoder-decoder).",
     },
   ];
 
   const handleSelect = (modelRepo: string) => {
-    // store the actual HF repo string
     setSelectedModel(modelRepo);
     setIsModified(false);
     router.push("/modify");
