@@ -1,3 +1,4 @@
+// app/modify/page.tsx
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,9 +21,9 @@ export default function ModifyModelPage() {
   );
 
   const [isLoading, setIsLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
+  const [progress, setProgress] = useState(0);
 
-  const handleModify = async () => {
+  const handleModify = () => {
     if (!selectedModel) {
       alert("Please select a model first.");
       return;
@@ -45,30 +46,45 @@ export default function ModifyModelPage() {
       };
     }
 
-    const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080").replace(/\/+$/, "");
-
+    // Simulate long-running modify (2–3 minutes)
+    const duration = 120000 + Math.random() * 60000; // ms
+    const tick = duration / 100;
     setIsLoading(true);
-    setSuccessMsg("");
-    try {
-      const { data } = await axios.post(
-        `${backendUrl}/modify-file`,
-        payload,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      if (data.success) {
-        setSuccessMsg("✅ Model has been modified!");
-        setIsModified(true);
-        // auto‐navigate after a short delay:
-        setTimeout(() => router.push("/chat"), 1200);
-      } else {
-        alert("Modify failed: " + JSON.stringify(data));
-      }
-    } catch (err: any) {
-      console.error("Modify error:", err.response?.data || err.message);
-      alert("Error modifying model: " + (err.response?.data?.detail || err.message));
-    } finally {
-      setIsLoading(false);
-    }
+    setProgress(0);
+
+    const timer = setInterval(() => {
+      setProgress((p) => {
+        const next = p + 1;
+        if (next >= 100) {
+          clearInterval(timer);
+          // After simulation completes, call backend
+          axios
+            .post(
+              `${(process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080").replace(/\/+$/, "")}/modify-file`,
+              payload,
+              { headers: { "Content-Type": "application/json" } }
+            )
+            .then(({ data }) => {
+              if (data.success) {
+                alert("✅ Model has been modified!");
+                setIsModified(true);
+                router.push("/chat");
+              } else {
+                alert("Modify failed: " + JSON.stringify(data));
+              }
+            })
+            .catch((err) => {
+              console.error("Modify error:", err.response || err.message);
+              alert(
+                "Error modifying model: " + (err.response?.data?.detail || err.message)
+              );
+            })
+            .finally(() => setIsLoading(false));
+          return 100;
+        }
+        return next;
+      });
+    }, tick);
   };
 
   if (!selectedModel) {
@@ -82,12 +98,6 @@ export default function ModifyModelPage() {
 
   return (
     <div className="modify-model-page container">
-      {/* Loading bar */}
-      {isLoading && <div className="loading-bar" />}
-
-      {/* Success banner */}
-      {successMsg && <div className="success-banner">{successMsg}</div>}
-
       <h2>Modify {selectedModel}</h2>
       <div className="mode-toggle">
         <button
@@ -150,13 +160,22 @@ export default function ModifyModelPage() {
       )}
 
       <div className="button-group">
-        <button
-          onClick={handleModify}
-          className="btn modify-btn"
-          disabled={isLoading}
-        >
-          Modify Settings
-        </button>
+        {isLoading ? (
+          <div className="progress-bar-container">
+            <div
+              className="progress-bar"
+              style={{ width: `${progress}%` }}
+            />
+            <p>{progress}%</p>
+          </div>
+        ) : (
+          <button
+            onClick={handleModify}
+            className="btn modify-btn"
+          >
+            Modify Settings
+          </button>
+        )}
       </div>
 
       <Footer />
