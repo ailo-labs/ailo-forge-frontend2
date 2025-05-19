@@ -18,8 +18,6 @@ export default function Footer() {
         <span>|</span>
         <Link href="/train" legacyBehavior><a>Train</a></Link>
         <span>|</span>
-        <a href="http://ailolabs.com" target="_blank" rel="noopener noreferrer">Ailo Labs Home</a>
-        <span>|</span>
         <a
           href="https://x.com/ailolabs?s=21&t=xn49oB2Do1SwQ6xXrDHWAw"
           target="_blank"
@@ -46,7 +44,7 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            GitHub documentation
+            Ailo Labs
           </a>
           .
         </p>
